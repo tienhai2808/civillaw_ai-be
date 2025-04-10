@@ -7,20 +7,22 @@ from langchain_community.vectorstores.faiss import InMemoryDocstore
 from langchain_core.documents import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from tqdm import tqdm
-from .embeddings import TransformersEmbeddings
+import sys
 
-# Thêm biến môi trường để tránh lỗi OpenMP
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.append(project_root)
+from utils.embeddings import TransformersEmbeddings
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 embedding = TransformersEmbeddings()
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-json_path = os.path.join(current_dir, "data", "laws.json")
 
-if not os.path.exists(json_path):
-  raise FileNotFoundError(f"File not found at: {json_path}")
+laws_json_path = os.path.join(project_root, "data", "laws.json")
+vector_store_path = os.path.join(project_root, "vector_store")
 
-with open(json_path, "r", encoding="utf-8") as f:
+with open(laws_json_path, "r", encoding="utf-8") as f:
   laws_data = json.load(f)
 
 text_splitter = RecursiveCharacterTextSplitter(
@@ -69,6 +71,5 @@ for i in tqdm(range(0, len(documents), batch_size), desc="Building FAISS index")
   torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
 # Lưu index
-save_path = os.path.join(current_dir, "faiss")
-vector_store.save_local(save_path)
-print(f"✅ Đã lưu FAISS index vào thư mục {save_path}")
+vector_store.save_local(vector_store_path)
+print(f"✅ Đã lưu FAISS index vào thư mục {vector_store_path}")

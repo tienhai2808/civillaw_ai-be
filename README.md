@@ -1,4 +1,9 @@
+## Install library
+
+```bash
+pip install -r requirements.txt
+
 ## Run server
 
 ```bash
-node uvicorn main:app --reload
+uvicorn main:app --reload

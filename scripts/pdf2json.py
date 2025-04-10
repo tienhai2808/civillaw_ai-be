@@ -1,6 +1,7 @@
 import fitz 
 import json
 import re
+import os
 
 def extract_articles_from_pdf(pdf_path):
   doc = fitz.open(pdf_path)
@@ -52,8 +53,11 @@ def save_to_json(articles, output_path):
     json.dump(articles, f, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
-  pdf_path = "./data/legal_dansu_2.pdf" 
-  output_path = "./data/laws.json"
+  current_dir = os.path.dirname(os.path.abspath(__file__))
+  data_dir = os.path.join(current_dir, "..", "data")
+
+  pdf_path = os.path.join(data_dir, "legal_dansu_2.pdf")
+  output_path = os.path.join(data_dir, "laws.json")
     
   articles = extract_articles_from_pdf(pdf_path)
   save_to_json(articles, output_path)
